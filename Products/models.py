@@ -24,6 +24,9 @@ class Product(models.Model):
 
     name = models.CharField(max_length=30,null=False,blank=False)
     brand = models.CharField(max_length=15,null=True,blank=True)
+    quantity = models.CharField(max_length=20,null=False,blank=False)
+    retail_price = models.CharField(max_length=30,null=True,blank=True)
+    margin_price = models.CharField(max_length=30,null=True,blank=True)
     discount_price = models.CharField(max_length=10,null=True,blank=True)
     actual_price = models.CharField(max_length=10,null=True,blank=True)
     discount_percentage = models.CharField(max_length=15,null=True,blank=True)
@@ -33,6 +36,7 @@ class Product(models.Model):
     category = models.CharField(max_length=20,null=True,blank=True,choices=category)
     special_offer = models.CharField(max_length=20,null=True,blank=True,choices=boolean)
     best_offer = models.CharField(max_length=20,null=True,blank=True,choices=boolean)
+    upload_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name

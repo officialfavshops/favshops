@@ -2,6 +2,7 @@ from django.db import models
 from .managers import UserManager
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import PermissionsMixin
+from cart.models import Cart
 
 # Create your models here.
 class User(AbstractBaseUser,PermissionsMixin):
@@ -17,6 +18,7 @@ class User(AbstractBaseUser,PermissionsMixin):
     is_active = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+    #cart = models.ForeignKey(Cart,null=True,blank=True,on_delete=models.SET_NULL)
 
     def make_exist_user(self):
         self.new_user = False
