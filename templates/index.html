@@ -1,9 +1,10 @@
 {% extends 'base.html' %}{% load static %} {% block content %}
 <!---->
+
+
 <div class="header">
 
     <div class="container">
-
 
         <div class="nav-top">
             <nav class="navbar navbar-default">
@@ -20,10 +21,10 @@
                 </div>
                 <div class="collapse navbar-collapse" id="bs-megadropdown-tabs">
                     <ul class="nav navbar-nav ">
-                        <li class=" active"><a href="/" class="hyper "><span>Home</span></a></li>
+                        <li class=" active"><a href="{% url 'index' %}" class="hyper "><span>Home</span></a></li>
 
                         <li class="dropdown ">
-                            <a href="" class="dropdown-toggle  hyper" data-toggle="dropdown"><span>Kitchen<b class="caret"></b></span></a>
+                            <a href="#" class="dropdown-toggle  hyper" data-toggle="dropdown"><span>Kitchen<b class="caret"></b></span></a>
                             <ul class="dropdown-menu multi">
                                 <div class="row">
                                     <div class="col-sm-3">
@@ -62,7 +63,7 @@
                                         </ul>
                                     </div>
                                     <div class="col-sm-3 w3l">
-                                        <a href="kitchen.html"><img src="{% static 'template/images/me.png'%}" class="img-responsive" alt=""></a>
+                                        <a href="kitchen.html"><img src="{% static 'template/images/me.png' %}" class="img-responsive" alt=""></a>
                                     </div>
                                     <div class="clearfix"></div>
                                 </div>
@@ -188,10 +189,7 @@
     </div>
 </div>
 
-<script>
-    window.jQuery || document.write('<script src="static/template/js/vendor/jquery-1.11.1.min.js"><\/script>')
-</script>
-<script src="{% static 'template/js/jquery.vide.min.js'%}"></script>
+
 <!--content-->
 <div class="content-top ">
     <div class="container ">

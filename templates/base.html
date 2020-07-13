@@ -1,14 +1,15 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html>
 
 <head>
-    <title>Big store a Ecommerce Online Shopping Category Flat Bootstrap Responsive Website Template| Home :: w3layouts</title>
+    <title> FAVShops </title>
     <!-- for-mobile-apps -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta property="og:title" content="Vide" />
-    <meta name="keywords" content="Big store Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template, 
+    <meta name="keywords" content="Big store Responsive web template, Bootstrap Web Templates, Flat Web Templates, Android Compatible web template,
 Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, SonyEricsson, Motorola web design" />
     <script type="application/x-javascript">
         addEventListener("load", function() {
@@ -20,15 +21,15 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
         }
     </script>
     <!-- //for-mobile-apps -->
-    <link href="{% static 'template/css/bootstrap.css'%}" rel='stylesheet' type='text/css' />
+    <link href="{% static 'template/css/bootstrap.css' %}" rel="stylesheet" type="text/css" />
     <!-- Custom Theme files -->
-    <link href="{% static 'template/css/style.css'%}" rel='stylesheet' type='text/css' />
+    <link href="{% static 'template/css/style.css' %}" rel="stylesheet" type="text/css" />
     <!-- js -->
-    <script src="{% static 'template/js/jquery-1.11.1.min.js'%}"></script>
+    <script src="{% static 'template/js/jquery-1.11.1.min.js' %}"></script>
     <!-- //js -->
     <!-- start-smoth-scrolling -->
-    <script type="text/javascript" src="{% static 'template/js/move-top.js'%}"></script>
-    <script type="text/javascript" src="{% static 'template/js/easing.js'%}"></script>
+    <script type="text/javascript" src="{% static 'template/js/move-top.js' %}"></script>
+    <script type="text/javascript" src="{% static 'template/js/easing.js' %}"></script>
     <script type="text/javascript">
         jQuery(document).ready(function($) {
             $(".scroll").click(function(event) {
@@ -40,16 +41,14 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
         });
     </script>
     <!-- start-smoth-scrolling -->
-    <link href="{% static 'template/css/font-awesome.css'%}" rel="stylesheet">
+    <link href="{% static 'template/css/font-awesome.css' %}" rel="stylesheet">
     <link href='//fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <link href='//fonts.googleapis.com/css?family=Noto+Sans:400,700' rel='stylesheet' type='text/css'>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
-    <script src="{% static 'template/js/jquery.zoomtoo.js' %}"></script>
 
 
     <!--- start-rate---->
-    <script src="{% static 'template/js/jstarbox.js'%}"></script>
-    <link rel="stylesheet" href="{% static 'template/css/jstarbox.css'%}" type="text/css" media="screen" charset="utf-8" />
+    <script src="{% static 'template/js/jstarbox.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'template/css/jstarbox.css' %}" type="text/css" media="screen" charset="utf-8" />
     <script type="text/javascript">
         jQuery(function() {
             jQuery('.starbox').each(function() {
@@ -72,6 +71,12 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
         });
     </script>
     <!---//End-rate---->
+
+    <script>
+        window.jQuery || document.write('<script src="static/template/js/vendor/jquery-1.11.1.min.js"><\/script>')
+    </script>
+    <script src="{% static 'template/js/jquery.vide.min.js'%}"></script>
+
     <style>
         input::-webkit-input-placeholder {
             color: transparent;
@@ -150,8 +155,6 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
                     <li><a href="#" class="icon dribbble"><i class="fa fa-dribbble" aria-hidden="true"></i><span></span></a></li>
                 </ul>
             </div>
-
-
 
 
         </div>
@@ -315,7 +318,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
     <script type="text/javascript">
         $(document).ready(function() {
             $('#horizontalTab').easyResponsiveTabs({
-                type: 'default', //Types: default, vertical, accordion           
+                type: 'default', //Types: default, vertical, accordion
                 width: 'auto', //auto or any width like 600px
                 fit: true // 100% fit in a container
             });
@@ -330,7 +333,7 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
             	containerID: 'toTop', // fading element id
             	containerHoverID: 'toTopHover', // fading element hover id
             	scrollSpeed: 1200,
-            	easingType: 'linear' 
+            	easingType: 'linear'
             	};
             */
             $().UItoTop({
@@ -341,58 +344,10 @@ Smartphone Compatible web template, free webdesigns for Nokia, Samsung, LG, Sony
     <a href="#" id="toTop" style="display: block;"> <span id="toTopHover" style="opacity: 1;"> </span></a>
     <!-- //smooth scrolling -->
     <!-- for bootstrap working -->
-    <script src="{% static 'template/js/bootstrap.js'%}"></script>
+    <script src="{% static 'template/js/bootstrap.js'%}" type="text/javascript"></script>
     <!-- //for bootstrap working -->
-    <script type='text/javascript' src="{% static 'template/js/jquery.mycart.js'%}"></script>
-    <script type="text/javascript">
-        $(function() {
 
-            var goToCartIcon = function($addTocartBtn) {
-                var $cartIcon = $(".my-cart-icon");
-                var $image = $('<img width="30px" height="30px" src="' + $addTocartBtn.data("image") + '"/>').css({
-                    "position": "fixed",
-                    "z-index": "999"
-                });
-                $addTocartBtn.prepend($image);
-                var position = $cartIcon.position();
-                $image.animate({
-                    top: position.top,
-                    left: position.left
-                }, 500, "linear", function() {
-                    $image.remove();
-                });
-            }
-
-            $('.my-cart-btn').myCart({
-                classCartIcon: 'my-cart-icon',
-                classCartBadge: 'my-cart-badge',
-                affixCartIcon: true,
-                checkoutCart: function(products) {
-                    $.each(products, function() {
-                        console.log(this);
-                    });
-                },
-                clickOnAddToCart: function($addTocart) {
-                    goToCartIcon($addTocart);
-                },
-                getDiscountPrice: function(products) {
-                    var total = 0;
-                    $.each(products, function() {
-                        total += this.quantity * this.price;
-                    });
-                    return total * 1;
-                }
-            });
-
-        });
-    </script>
-    <script>
-        $(function() {
-            $("#picture-frame").zoomToo({
-                magnify: 1
-            });
-        });
-    </script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
 
 
 </body>
