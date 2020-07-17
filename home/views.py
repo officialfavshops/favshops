@@ -39,17 +39,18 @@ def forget_password(request):
 
 def admin_page(request):
     
-    return render(request,'admin_page.html')
+    return redirect('all_products')
 
 def about(request):
     return render(request,'about.html')
 
 def order_history(request):
     mnumber = request.user.mobile_number
-    orders = Order.objects.filter(mobile_number = mnumber).order_by('-date')
+    orders = Order.objects.filter(mobile_number = mnumber).order_by('-date').filter(order_canceled=False)
     total = 0
     for ord in orders:
         total += int(ord.price)
+
 
     return render(request,'order_history.html',{'orders':orders,'total':total})
 
@@ -63,3 +64,85 @@ def profile_page(request):
 def product_details(request,pk):
     prod = Product.objects.get(pk=pk)
     return render(request,'product_details.html',{'product':prod})
+
+def delivery_boy(request):
+    not_packed = Order.objects.filter(packed = False).order_by('order_id').filter(delivered=False)
+    not_delivered = Order.objects.filter(delivered=False)
+
+    not_packed_ids = set([i.order_id for i in not_packed])
+    sorted_not_packed_ids = sorted(not_packed_ids)
+    #print(not_packed_ids)
+
+    list = []
+    dict = {}
+
+    for id in sorted_not_packed_ids:
+        list = []
+        for j in not_packed:
+            if j.order_id == id:
+                list.append(j)
+        dict[id] = list
+
+
+    return render(request,'delivery_boy.html',{'not_packed':not_packed,'not_delivered':not_delivered,'not_packed_ids':not_packed_ids,'dict':dict})
+
+
+def not_delivered(request):
+    not_delivered = Order.objects.filter(delivered=False).filter(packed=True).order_by('order_id').filter(order_canceled = False)
+
+    not_delivered_ids = set([i.order_id for i in not_delivered])
+    sorted_not_delivered_ids = sorted(not_delivered_ids)
+
+    list = []
+    dict = {}
+    total_price = 0.0
+    dict_total = {}
+    dict_address = {}
+    delivery_charge = 0
+
+
+    for id in sorted_not_delivered_ids:
+        list = []
+        total_price = 0
+        delivery_charge = 0
+        for j in not_delivered:
+            if j.order_id == id:
+                list.append(j)
+                total_price += int(j.price)
+
+        if total_price <= 100:
+            delivery_charge = 10
+        elif total_price > 100 and total_price <= 200:
+            delivery_charge = 15
+        elif total_price > 200 and total_price <= 350:
+            delivery_charge = 20
+        elif total_price > 350 and total_price <= 500:
+            delivery_charge = 25
+        else:
+            delivery_charge = 0
+
+
+        order = Order.objects.filter(order_id=id)[0]
+        address = order.address
+        contactno = order.mobile_number
+        
+        dict_address[id] = address
+
+
+        final_price = delivery_charge + total_price
+    
+        price_address = [(final_price,address,contactno),]
+        list.append(price_address)
+        dict[id] = list
+        dict_total[id] = final_price
+        print(dict_address)
+
+    return render(request,'not_delivered.html',{'dict':dict,'dict_total':dict_total,'dict_address':dict_address})
+
+def order_packed(request,pk):
+    order = Order.objects.get(pk=pk)
+    order.packed = True
+    order.status = 'Packed'
+    order.save()
+    return redirect('delivery_boy_page')
+

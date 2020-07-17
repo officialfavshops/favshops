@@ -14,4 +14,8 @@ urlpatterns = [
     path('contact',views.contact,name='contact'),
     path('profile_page',views.profile_page,name='profile_page'),
     path('product_details/<int:pk>/',views.product_details,name='product_details'),
+    path('delivery_boy_page',views.delivery_boy,name='delivery_boy_page'),
+    path('not_delivered',views.not_delivered,name='not_delivered'),
+    path('order_packed/<int:pk>/',views.order_packed,name='order_packed'),
+    
 ]

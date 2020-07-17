@@ -53,12 +53,26 @@ def cart_checkout(request):
     fname = request.user.first_name
     lname = request.user.last_name
     total = 0
+    delivery_charge = 0
     cart = Cart.objects.filter(mobile_number = mnumber).order_by('-add_time')
     address = Address.objects.filter(mobile_number = mnumber).first()
     total_product = len(cart)
     for data in cart:
-        total += int(data.product.discount_price) 
-    
+        total += int(data.product.discount_price)
+
+    if total <= 100:
+            delivery_charge = 10
+    elif total > 100 and total <= 200:
+        delivery_charge = 15
+    elif total > 200 and total <= 350:
+        delivery_charge = 20
+    elif total > 350 and total <= 500:
+        delivery_charge = 25
+    else:
+        delivery_charge = 0
+
+    final_price = delivery_charge + total
+
     if request.method == 'POST':
         total = 0
         number = request.user.mobile_number
@@ -70,6 +84,19 @@ def cart_checkout(request):
         for data in cart:
             total += int(data.product.discount_price)
 
+        if total <= 100:
+            delivery_charge = 10
+        elif total > 100 and total <= 200:
+            delivery_charge = 15
+        elif total > 200 and total <= 350:
+            delivery_charge = 20
+        elif total > 350 and total <= 500:
+            delivery_charge = 25
+        else:
+            delivery_charge = 0
+
+        final_price = delivery_charge + total
+
         if form.is_valid():
             addr = form.save(commit=False)
             addr.mobile_number = mnumber
@@ -80,11 +107,18 @@ def cart_checkout(request):
             pin = form.cleaned_data['pin']
             dist = form.cleaned_data['dist']
             state = form.cleaned_data['state']
-            total_address = fname +  " " + lname + " , " + at + " , " + post + " , " + panchayat + " , " + dist + " , " + pin + " , " + state
-            return render(request,'payment_page.html',{'total':total,'address':total_address,'total_product':total_product})
+
+            al_number = form.cleaned_data['alternate_number']
+            if al_number:
+                pass
+            else:
+                al_number = ","
+
+            total_address = fname +  " " + lname + " , " + at + " , " + post + " , " + panchayat + " , " + dist + " , " + pin + " , " + state + " , " + al_number
+            return render(request,'payment_page.html',{'total':total,'delivery_charge':delivery_charge,'final_price':final_price,'address':total_address,'total_product':total_product})
     else:
         form = address_form(instance=address)
-    return render(request,'checkout_page.html',{'total':total,'total_product':total_product,'form':form})
+    return render(request,'checkout_page.html',{'total':total,'delivery_charge':delivery_charge,'final_price':final_price,'total_product':total_product,'form':form})
 
 
 
@@ -162,30 +196,58 @@ def create_order(request,response_dict):
     order.save()
     return render(request,'paymentstatus.html',{'response': response_dict})
 
+def generate_id():
+    order = Order.objects.order_by('-order_date')
+    if order:
+        order = order[0]
+        orderid = order.order_id
+        new_id = orderid[:3] + str(int(orderid[3:]) + 1 ).zfill(4)
+        return new_id
+    else:
+        return 'FAV0001'
+
+
 def create_order_cod(request):
     mnumber = request.user.mobile_number
     total = 0
-    
+    delivery_charge = 0
     cart = Cart.objects.filter(mobile_number = mnumber).order_by('-add_time')
     address = Address.objects.filter(mobile_number = mnumber).first()
-    total_address = address.at + " , " + address.post + " , " + address.dist + " , " + address.pin 
+    al_number = ","
+    if address.alternate_number:
+        al_number = address.alternate_number
+
+    total_address = request.user.first_name + " " + request.user.last_name + " , " + address.at + " , " + address.post + " , " + address.panchayat + " , " + address.dist + " , " + address.pin + " , " + al_number
     total_product = len(cart)
     for data in cart:
         total += int(data.product.discount_price)
     #id = Orderid.generate_id()
-    global orderid
-    ordid = orderid[:3] + str(int(orderid[3:]) + 1 ).zfill(4)
-    orderid = ordid
-    id = orderid
+
+    if total <= 100:
+            delivery_charge = 10
+    elif total > 100 and total <= 200:
+        delivery_charge = 15
+    elif total > 200 and total <= 350:
+        delivery_charge = 20
+    elif total > 350 and total <= 500:
+        delivery_charge = 25
+    else:
+        delivery_charge = 0
+
+    final_price = delivery_charge + total
+
+    ordid = generate_id()
+    id = ordid
     payment_mode = 'COD'
+    status = 'Shipping'
     for item in cart:
-        order = Order(image=item.product.image,order_id=id,payment_mode=payment_mode,mobile_number = mnumber,name=item.product.name,quantity = item.product.quantity,price=item.product.discount_price,address=total_address)
+        order = Order(image=item.product.image,order_id=id,payment_mode=payment_mode,mobile_number = mnumber,name=item.product.name,quantity = item.product.quantity,price=item.product.discount_price,address=total_address,status=status,margin_price=item.product.margin_price)
         order.save()
-    
+
     for item in cart:
         item.delete()
 
-    return id,total
+    return id,final_price
 
 
 @csrf_exempt
@@ -197,7 +259,7 @@ def handlerequest(request):
         response_dict[i] = form[i]
         if i == 'CHECKSUMHASH':
             checksum = form[i]
-    
+
     verify = Checksum.verify_checksum(response_dict, MERCHANTKEY, checksum)
 
     if verify:

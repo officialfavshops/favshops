@@ -18,6 +18,7 @@ class User(AbstractBaseUser,PermissionsMixin):
     is_active = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
+    is_delivery_boy = models.BooleanField(default=False)
     #cart = models.ForeignKey(Cart,null=True,blank=True,on_delete=models.SET_NULL)
 
     def make_exist_user(self):

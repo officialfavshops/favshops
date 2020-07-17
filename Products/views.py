@@ -13,12 +13,13 @@ def add_products(request):
         form = Product_form(request.POST or None,request.FILES or None)
         if form.is_valid():
             product = form.save(commit=False)
-            dis_price = int(form.cleaned_data['discount_price'])
+            #dis_price = int(form.cleaned_data['discount_price'])
+            act_price = int(form.cleaned_data['actual_price'])
             mrg_price =int(form.cleaned_data['margin_price'])
             rtl_price = int(form.cleaned_data['retail_price'])
-            ac_price = int(mrg_price) + int(rtl_price)
-            product.actual_price = str(ac_price)
-            per = math.ceil((dis_price / ac_price) * 100)
+            discount_price = int(mrg_price) + int(rtl_price)
+            product.discount_price = str(discount_price)
+            per = math.ceil((discount_price / act_price) * 100)
             per = 100 - per
             product.discount_percentage = per
             product.save()
@@ -33,7 +34,7 @@ def add_products(request):
 def all_products(request):
     products = Product.objects.all().order_by('-upload_time')
 
-    return render(request,'all_products.html',{'products':products})
+    return render(request,'admin_page.html',{'products':products})
 
 def edit_product(request,pk):
     products = Product.objects.all()

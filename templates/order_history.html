@@ -28,7 +28,13 @@
                     <p><strong>Quantity</strong> : {{order.quantity}}</p>
                     <p><strong>Payment Mode</strong> : {{order.payment_mode}}</p>
                     <p><strong>Date</strong> : {{order.date}}</p>
+                    <p><strong>Status</strong> : <span style="color: brown;">{{order.status}}</span></p>
 
+                </div>
+                <div class="forg">
+                    {% if not order.packed and not order.delivered %}
+                    <a href="{% url 'order/cancel_order' pk=order.pk %}" class="forg-right" style="margin-top: 3px;margin-right:2px;"><button class="btn btn-warning">Cancel Order</button></a>{% endif %}
+                    <div class="clearfix"></div>
                 </div>
             </div>
 

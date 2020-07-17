@@ -17,12 +17,18 @@
             <h4 style="color: red;margin-bottom:5px;font-weight:bold;">{{messages}}</h4>
             {% endif %}
 
-            <div class="forg" style="align-items: center;margin-top:3px;">
-                <h4 class="forg-left" style="margin-bottom:10px;">Your Total Price : <strong>{{total}}</strong></h4>
+            <!--<div class="forg" style="align-items: center;margin-top:3px;">
+                <h5 class="forg-left" style="margin-bottom:10px;">Your Price : <strong>{{total}}</strong></h5><br>
+                <h5 style="margin-bottom:10h5x;">Delivery Charge : <strong>{{delivery_charge}}</strong></h5><br>
+                <p class="forg-right" style="margin-bottom:10px;">Final Price : <strong>{{final_price}}</strong></p><br>
+                <h5 style="margin-bottom: 15px;">Total Product : <strong>{{total_product}}</strong></h5>
 
                 <div class="clearfix"></div>
-            </div>
-            <h5 style="margin-bottom: 15px;">Your Total Product : <strong>{{total_product}}</strong></h5>
+            </div>-->
+            <h5 style="margin-top: -3px;">Your Price : <strong>{{total}}</strong></h5>
+            <h5 style="margin-top: 3px;">Delivery Charge : <strong>{{delivery_charge}}</strong></h5>
+            <h5 style="margin-top: 3px;color:black;">Final Price : <strong>{{final_price}}</strong></h5>
+            <h5 style="margin-top: 3px;">Total Product : <strong>{{total_product}}</strong></h5>
 
             <h4 style="text-align: center;color:cadetblue;font-weight:bold;"> Delivery Address </h4>
             <form method="post" novalidate enctype="multipart/form-data">

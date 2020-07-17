@@ -27,7 +27,8 @@
         </div>
         <div class="forg" style="margin-top: 10px;">
             <a href="{% url 'user_logout' %}"><button class="btn btn-danger my-cart-btn my-cart-btn1 "> Logout </button></a> {% if user.is_admin %}
-            <a href="{% url 'admin_page' %}"><button class="btn btn-danger my-cart-btn my-cart-btn1 " > Admin Page </button></a> {% endif %}
+            <a href="{% url 'admin_page' %}"><button class="btn btn-danger my-cart-btn my-cart-btn1 " > Admin Page </button></a> {% endif %} {% if user.is_delivery_boy %}
+            <a href="{% url 'delivery_boy_page' %}"><button class="btn btn-warning my-cart-btn my-cart-btn1 " > Delivery </button></a> {% endif %}
             <div class="clearfix"></div>
         </div>
     </div>
