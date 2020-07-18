@@ -25,7 +25,7 @@ SECRET_KEY = 'aunuscu8wu1sj+ly@ml^1h5l&p#2cpssf(8@(g8xy*atn0r0z-'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*','www.favshops.com','favshops.com']
 
 
 # Application definition
