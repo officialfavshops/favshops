@@ -87,8 +87,13 @@ WSGI_APPLICATION = 'grocery_shop.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'favshop1_favshop_db',
+        'USER' : 'favshop1_admin_tarachand',
+        'PASSWORD' : 'tara@9040',
+        'HOST' :'localhost',
+        'PORT' : '3306',
+
     }
 }
 
