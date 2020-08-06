@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'aunuscu8wu1sj+ly@ml^1h5l&p#2cpssf(8@(g8xy*atn0r0z-'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*','www.favshops.com','favshops.com']
 
@@ -142,3 +142,12 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 
 
+
+
+#Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT= 587
+EMAIL_HOST_USER = 'officialfavshops@gmail.com'
+EMAIL_HOST_PASSWORD='tara9040'

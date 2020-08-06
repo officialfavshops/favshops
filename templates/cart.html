@@ -19,21 +19,30 @@
             <div class="row" style="background-color:rgb(245, 240, 240);">
                 <div class="col-6 col-sm-4"><img src="{{obj.product.image.url}}" alt="image" class="img-responsive" height="170" width="300"></div>
                 <div class="col-8 col-sm-6">
-                    <p style="margin-top: 3px;"><strong>Name</strong> : {{obj.product.name}}</p>
+                    <p style="margin-top: 3px;"><strong>Name</strong> : {{obj.product.product_name}}</p>
                     {% if obj.product.brand %}
                     <p><strong>Brand</strong> : {{obj.product.brand}}</p>
                     {% endif %}
-                    <p><strong>Your Price</strong> : {{obj.product.discount_price}}</p>
-                    <p><strong>Actual Price</strong> : <strike>{{obj.product.actual_price}}</strike></p>
                     <p><strong>Quantity</strong> : {{obj.product.quantity}}</p>
-                    <p style="margin-top: 5px;;"><a href="{% url 'delete_cart_item' pk=obj.pk %}"><span class="glyphicon glyphicon-remove" style="color: red;"></span> Remove </a> | <label for="quantity">Qty : </label>
-                        <select name="quantity" id="quantity" data-pk="{{obj.pk}}">
-                          <option value="1">1</option>
+                    <p><strong>Actual Price</strong> : <strike>{{obj.product.mrp}}</strike></p>
+                    <p><strong>Your Price</strong> : {{obj.product.discount_price}}</p>
+                    <p>
+
+                        <label for="quantity"><strong>Your Qty : </strong></label>
+                        <select name="quantity" class="customer_quantity" id="quantity{{obj.pk}}" data-pk="{{obj.pk}}">
+                         <option value="{{obj.customer_quantity}}">{{obj.customer_quantity}}</option>
+                         <option value="1">1</option>
                           <option value="2">2</option>
                           <option value="3">3</option>
                           <option value="4">4</option>
                           <option value="5">5</option>
+                          <option value="6">6</option>
+                          <option value="7">7</option>
+                          <option value="8">8</option>
+                          <option value="9">9</option>
+                          <option value="10">10</option>
                         </select></p>
+                    <p style="margin-top: 5px;;"><a href="{% url 'delete_cart_item' pk=obj.pk %}"><span class="glyphicon glyphicon-remove" style="color: red;"></span> Remove </a></p>
                 </div>
                 <!--<div class="col-6 col-sm-4"><a href="{% url 'delete_cart_item' pk=obj.pk %}"><span class="glyphicon glyphicon-remove" style="color: red;"></span></a></div>-->
 
@@ -44,7 +53,7 @@
                 <a href=""><button class="btn btn-primary">Total Price</button></a>
             </div>-->
             <div class="forg" style="align-items: center;margin-top:3px;">
-                <h4 class="forg-left" style="margin-bottom:20px;"> Total : {{total}}</h4>
+                <h4 class="forg-left" style="margin-bottom:20px;" id="total"> Total : {{total}}</h4>
                 <div class="clearfix"></div>
             </div>
             {% else %}
@@ -60,19 +69,32 @@
 </div>
 
 {% block javascript %}
+
 <script type="text/javascript">
-    $('#quantity').change(function() {
-        console.log("Hey quantity");
-        var quantity = $(this).val();
+    $('.customer_quantity').change(function() {
+        var val;
+        var pk;
+        pk = $(this).attr("data-pk");
+        id = "#quantity" + pk
+        cq_id = "#c_qty" + pk
+        val = $(id).val()
+        console.log(cq_id + " " + pk)
         $.ajax({
             url: '{% url "change_quantity" %}',
             data: {
-                'quantity': quantity,
-                'pk': $('#quantity').attr('data-pk')
+                'pk': pk,
+                'val': val,
             },
-            dataType: "json"
-
+            dataType: 'json',
+            success: function(data) {
+                if (data.updated) {
+                    document.getElementById('total').textContent = data.total;
+                    document.getElementById(id).selectedIndex = val;
+                    $(cq_id).text = val;
+                }
+            }
         })
     });
 </script>
+
 {% endblock %} {% endblock %}

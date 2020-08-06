@@ -1,4 +1,5 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,HttpResponse
+from django.http import JsonResponse
 from Products.models import Product
 from .models import Cart
 from address.forms import address_form
@@ -8,6 +9,10 @@ from order.models import Order
 from User.models import User
 from django.views.decorators.csrf import csrf_exempt
 from .paytm import Checksum
+import math
+from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
+
 
 #MERCHENTID = 'rJXvah34753603915703'
 MERCHANTKEY = 'hTF&Qc@AU9Vf_NdM'
@@ -26,27 +31,48 @@ def add_to_cart(request,pk):
     #print(request.user.cart)
     return redirect('index')
 
+
+def add_to_cart_ajax(request):
+
+    pk = request.GET.get('id',None)
+    product = Product.objects.get(pk=pk)
+    mobile_number = request.user.mobile_number
+    total_cart = Cart.objects.filter(mobile_number=mobile_number)
+    cart = Cart.objects.create(mobile_number=mobile_number,product=product)
+    cart.save()
+    new_total_cart = Cart.objects.filter(mobile_number=mobile_number)
+    print('Cart Added')
+    pname = product.product_name
+
+    data={
+            'added': ['True' if len(new_total_cart) > len(total_cart) else 'False'],
+            'cart_len':len(new_total_cart),
+            'pname':pname
+        }
+    return JsonResponse(data)
+
+
 def delete_cart_item(request,pk):
     cart_product = Cart.objects.get(pk=pk)
     cart_product.delete()
     return redirect('cart_page')
 
 def change_quantity(request):
-    print('we are in change quantity')
     pk = request.GET.get('pk',None)
-    quantity = request.GET.get('quantity',None)
-    print(pk,quantity)
-    cart_product = Cart.objects.get(pk=pk)
-    product_qnt = cart_product.product.quantity.split(' ')
-    product_qnt[0] = str(quantity)
-    str_quantity = ' '.join(product_qnt)
-    cart_product.product.quantity = str_quantity
-    print(cart_product.product.quantity)
-    cart_product.save()
-    print(cart_product.product.quantity)
-    new = Cart.objects.get(pk=pk)
-    print(new.product.quantity)
-    return redirect('cart_page')
+    val = request.GET.get('val',None)
+    cart_item = Cart.objects.get(pk=pk)
+    cart_item.customer_quantity = val
+    cart_item.save()
+    mnumber = request.user.mobile_number
+    total = 0.0
+    cart = Cart.objects.filter(mobile_number = mnumber).order_by('-add_time')
+    for data in cart:
+        total += float(data.product.discount_price) * float(data.customer_quantity)
+    data = {
+        'updated':True,
+        'total':total
+    }
+    return JsonResponse(data)
 
 def cart_checkout(request):
     mnumber = request.user.mobile_number
@@ -54,14 +80,20 @@ def cart_checkout(request):
     lname = request.user.last_name
     total = 0
     delivery_charge = 0
+    total_mrp_price = 0.0
     cart = Cart.objects.filter(mobile_number = mnumber).order_by('-add_time')
     address = Address.objects.filter(mobile_number = mnumber).first()
     total_product = len(cart)
     for data in cart:
-        total += int(data.product.discount_price)
+        total += float(data.product.discount_price) * float(data.customer_quantity)
+        total_mrp_price += float(data.product.mrp) * float(data.customer_quantity)
+
+    you_save = total_mrp_price - total
+    you_save_percentage = round((you_save / total_mrp_price) * 100)
+
 
     if total <= 100:
-            delivery_charge = 10
+        delivery_charge = 10
     elif total > 100 and total <= 200:
         delivery_charge = 15
     elif total > 200 and total <= 350:
@@ -72,9 +104,11 @@ def cart_checkout(request):
         delivery_charge = 0
 
     final_price = delivery_charge + total
+    final_price = math.floor(final_price)
 
     if request.method == 'POST':
-        total = 0
+        total = 0.0
+        total_mrp_price = 0.0
         number = request.user.mobile_number
         if address:
             form = address_form(request.POST or None,instance=address)
@@ -82,7 +116,11 @@ def cart_checkout(request):
             form = address_form(request.POST or None)
 
         for data in cart:
-            total += int(data.product.discount_price)
+            total += float(data.product.discount_price) * float(data.customer_quantity)
+            total_mrp_price += float(data.product.mrp) * float(data.customer_quantity)
+
+        you_save = total_mrp_price - total
+        you_save_percentage = round((you_save / total_mrp_price) * 100)
 
         if total <= 100:
             delivery_charge = 10
@@ -101,8 +139,9 @@ def cart_checkout(request):
             addr = form.save(commit=False)
             addr.mobile_number = mnumber
             addr.save()
+            full_name = form.cleaned_data['full_name']
             at = form.cleaned_data['at']
-            post = form.cleaned_data['post']
+            landmark = form.cleaned_data['landmark']
             panchayat = form.cleaned_data['panchayat']
             pin = form.cleaned_data['pin']
             dist = form.cleaned_data['dist']
@@ -114,11 +153,11 @@ def cart_checkout(request):
             else:
                 al_number = ","
 
-            total_address = fname +  " " + lname + " , " + at + " , " + post + " , " + panchayat + " , " + dist + " , " + pin + " , " + state + " , " + al_number
-            return render(request,'payment_page.html',{'total':total,'delivery_charge':delivery_charge,'final_price':final_price,'address':total_address,'total_product':total_product})
+            total_address = full_name + " , " + at + " , " + landmark + " , " + panchayat + " , " + dist + " , " + pin + " , " + state + " , " + al_number
+            return render(request,'payment_page.html',{'total':total,'delivery_charge':delivery_charge,'final_price':final_price,'address':total_address,'total_product':total_product,'you_save':you_save,'you_save_percentage':you_save_percentage,'total_mrp_price':total_mrp_price})
     else:
         form = address_form(instance=address)
-    return render(request,'checkout_page.html',{'total':total,'delivery_charge':delivery_charge,'final_price':final_price,'total_product':total_product,'form':form})
+    return render(request,'checkout_page.html',{'total':total,'delivery_charge':delivery_charge,'final_price':final_price,'total_product':total_product,'form':form,'you_save':you_save,'you_save_percentage':you_save_percentage,'total_mrp_price':total_mrp_price})
 
 
 
@@ -182,14 +221,14 @@ def cart_checkout(request):
 
 def create_order(request,response_dict):
     mnumber = request.user.mobile_number
-    total = 0
+    total = 0.0
     response_dict = response_dict
 
     cart = Cart.objects.filter(mobile_number = mnumber).order_by('-add_time')
     address = Address.objects.filter(mobile_number = mnumber).first()
     total_product = len(cart)
     for data in cart:
-        total += int(data.product.discount_price)
+        total += float(data.product.discount_price) * float(data.customer_quantity)
 
     id = Order.get_order_id(request)
     order = Order(order_id = id,mobile_number=request.user.mobile_number,cart=cart,total_price = total,address=address)
@@ -209,18 +248,19 @@ def generate_id():
 
 def create_order_cod(request):
     mnumber = request.user.mobile_number
-    total = 0
+    total = 0.0
     delivery_charge = 0
     cart = Cart.objects.filter(mobile_number = mnumber).order_by('-add_time')
     address = Address.objects.filter(mobile_number = mnumber).first()
     al_number = ","
     if address.alternate_number:
         al_number = address.alternate_number
+    full_name = address.full_name
 
-    total_address = request.user.first_name + " " + request.user.last_name + " , " + address.at + " , " + address.post + " , " + address.panchayat + " , " + address.dist + " , " + address.pin + " , " + al_number
+    total_address = full_name + " , " + address.at + " , " + address.landmark + " , " + address.panchayat + " , " + address.dist + " , " + address.pin + " , " + al_number
     total_product = len(cart)
     for data in cart:
-        total += int(data.product.discount_price)
+        total += float(data.product.discount_price) * float(data.customer_quantity)
     #id = Orderid.generate_id()
 
     if total <= 100:
@@ -241,13 +281,18 @@ def create_order_cod(request):
     payment_mode = 'COD'
     status = 'Shipping'
     for item in cart:
-        order = Order(image=item.product.image,order_id=id,payment_mode=payment_mode,mobile_number = mnumber,name=item.product.name,quantity = item.product.quantity,price=item.product.discount_price,address=total_address,status=status,margin_price=item.product.margin_price)
+        brand = ''
+        if item.product.brand:
+            brand = item.product.brand
+        else:
+            brand = 'favshops'
+        order = Order(image=item.product.image,order_id=id,payment_mode=payment_mode,mobile_number = mnumber,name=item.product.product_name,brand=brand,quantity = item.product.quantity,price=item.product.discount_price,address=total_address,status=status,margin_price=item.product.margin_price,customer_quantity=item.customer_quantity)
         order.save()
 
     for item in cart:
         item.delete()
 
-    return id,final_price
+    return id,final_price,total_address
 
 
 @csrf_exempt
@@ -276,8 +321,14 @@ def payment_mode(request):
         mode = request.POST['payment']
         if mode == 'cod':
             print('hi')
-            id,total = create_order_cod(request)
+            id,total,address = create_order_cod(request)
+            number = request.user.mobile_number
+            subject = 'New Order Received'
+            msg = "{0}   {1}   {2}    {3}".format(id,total,address,number)
+            sender = 'officialfavshops@gmail.com'
+            receiver = 'tarachandpattu@gmail.com'
             if id:
+                send_mail(subject,msg,sender,[receiver],fail_silently=False)
                 return render(request,'success_order.html',{'id':id,'total':total})
         else:
             print('hello')

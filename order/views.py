@@ -22,7 +22,7 @@ def delete_packed_item(request,pk):
     order.order_canceled = True
     order.save()
 
-    return redirect('order_packed')
+    return redirect('delivery_boy_page')
 
 def order_delivered(request):
     if request.method == 'POST':
@@ -39,32 +39,44 @@ def order_delivered(request):
 
         co_orders = Order.objects.filter(order_id = ord_id).filter(order_canceled = False).filter(delivered=False)
         can_orders = Order.objects.filter(order_id = ord_id).filter(order_canceled = True).filter(delivered=False)
-        order_margin_price = 0
+        order_margin_price = 0.0
         order_delivery_charges = 0
 
         for ord in co_orders:
-            item = ord.name + " | " + ord.quantity + " | " + ord.price
+            brand = ''
+            if ord.brand:
+                brand = ord.brand
+            else:
+                brand = 'favshops'
+            item = ord.name + " | " + brand + " | " + ord.quantity + " | " + ord.price + " | " + ord.customer_quantity
             confirm_order += item + " , "
-            order_margin_price += int(ord.margin_price)
+            order_margin_price += float(ord.margin_price)
             mnumber = ord.mobile_number
             address = ord.address
             order_time = ord.order_date
             ord.delivered = True
+            ord.status = 'Delivered'
             ord.save()
 
         for ord in can_orders:
-            item = ord.name + " | " + ord.quantity + " | " + ord.price
+            brand = ''
+            if ord.brand:
+                brand = ord.brand
+            else:
+                brand = 'favshops'
+            item = ord.name + " | " + brand + " | " + ord.quantity + " | " + ord.price + " | " + ord.customer_quantity
             cancel_order += item + " , "
             ord.delivered = True
+            ord.status = 'Delivered'
             ord.save()
 
-        if int(price) <= 100:
+        if float(price) <= 100:
             order_delivery_charges = 10
-        elif int(price) > 100 and int(price) <= 200:
+        elif float(price) > 100 and float(price) <= 200:
             order_delivery_charges = 15
-        elif int(price) > 200 and int(price) <= 350:
+        elif float(price) > 200 and float(price) <= 350:
             order_delivery_charges = 20
-        elif int(price) > 350 and int(price) <= 500:
+        elif float(price) > 350 and float(price) <= 500:
             order_delivery_charges = 25
         else:
             order_delivery_charges = 0
@@ -80,20 +92,20 @@ def order_delivered(request):
 
 def admin_order_summary(request):
     summary = Admin_order_summary.objects.all().order_by('-delivered_time')
-    overall_delivery_charge = 0
-    overall_margin = 0
-    today_delivery_charge = 0
-    today_margin = 0
+    overall_delivery_charge = 0.0
+    overall_margin = 0.0
+    today_delivery_charge = 0.0
+    today_margin = 0.0
 
     today = datetime.today()
     print(today)
     today_summary = Admin_order_summary.objects.filter(date = today)
     print('summary ',today_summary)
     for ord in today_summary:
-        today_delivery_charge += int(ord.delivery_charges)
-        today_margin += int(ord.total_margin)
+        today_delivery_charge += float(ord.delivery_charges)
+        today_margin += float(ord.total_margin)
 
     for ord in summary:
-        overall_delivery_charge += int(ord.delivery_charges)
-        overall_margin += int(ord.total_margin)
+        overall_delivery_charge += float(ord.delivery_charges)
+        overall_margin += float(ord.total_margin)
     return render(request,'order_summary.html',{'summary':summary,'overall_delivery_charge':overall_delivery_charge,'overall_margin':overall_margin,'today_delivery_charge':today_delivery_charge,'today_margin':today_margin})

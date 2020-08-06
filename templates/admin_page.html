@@ -38,6 +38,7 @@
                     <li><a href="{% url 'add_products' %}">Add Products</a></li>
                     <li class="active"><a href="{% url 'all_products' %}">All Products</a></li>
                     <li><a href="{% url 'admin_order_summary' %}">Order Summary</a></li>
+                    <li><a href="{% url 'customers' %}">Customers</a></li>
                 </ul>
                 <!--<ul class="nav navbar-nav navbar-right">
                     <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
@@ -57,18 +58,21 @@
 
             {% endfor %} {% endif %}
             <h1 style="text-align: center;font-weight:bold;color:brown;"> All Products </h1>
+            <h5>Total Products Added : {{ total_products}}</h5>
 
             <hr> {% if products %}
             <table class="table table-hover">
                 <thead>
                     <tr>
                         <th scope="col">Sl No.</th>
-                        <th scope="col">Name</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Product Name</th>
                         <th scope="col">Brand</th>
+                        <th scope="col">Category</th>
                         <th scope="col">Retail Price</th>
                         <th scope="col">Margin Price</th>
                         <th scope="col">Discount Price</th>
-                        <th scope="col">Actual Price</th>
+                        <th scope="col">MRP</th>
                         <th scope="col">Edit</th>
                         <th scope="col">Delete</th>
                     </tr>
@@ -77,12 +81,14 @@
                 <tbody>
                     <tr>
                         <td>{{forloop.counter0}}</td>
-                        <td>{{data.name}}</td>
+                        <td><img src="{{data.image.url}}" height="60" width="60" class="img-responsive"></td>
+                        <td>{{data.product_name}}</td>
                         <td>{{data.brand}}</td>
+                        <td>{{data.category}}</td>
                         <td>{{data.retail_price}}</td>
                         <td>{{data.margin_price}}</td>
                         <td>{{data.discount_price}}</td>
-                        <td>{{data.actual_price}}</td>
+                        <td>{{data.mrp}}</td>
 
                         <th><a class="btn btn-primary" href="{% url 'edit_product' pk=data.pk %}" style="color: white;">Edit</a></th>
                         <th><a class="btn btn-danger" href="{% url 'delete_product' pk=data.pk %}" style="color: white;"> Delete </a></th>
@@ -95,7 +101,6 @@
         </div>
 
     </div>
-
 
 
 </body>
